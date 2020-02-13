@@ -1,11 +1,18 @@
 (ns memecollect.core
-  (:use ring.adapter.jetty hiccup.core))
+  (:require [ring.adapter.jetty :as jetty]
+            [compojure.core :refer [defroutes GET ANY]]
+            [compojure.route :as route]
+            [compojure.handler :as handler]
+            [memecollect.views.layout :as layout]
+            [memecollect.views.contents :as contents]))
 
-(defn handler [request]
-  {:status 200
-   :headers {"Content-Type" "text/html"}
-   :body (html [:span {:class "foo"} "bar"])})
+(defroutes routes
+  (GET "/" [] (layout/application "Home" (contents/index)))
+  (route/resources "/")
+  (ANY "*" [] (route/not-found (layout/application "Page Not Found" (contents/not-found)))))
+
+(def application (handler/site routes))
 
 (defn -main
   []
-  (run-jetty handler {:port 3000}))
+  (jetty/run-jetty application {:port 3000}))

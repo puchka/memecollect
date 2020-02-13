@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [ring/ring-core "1.6.3"]
                  [ring/ring-jetty-adapter "1.6.3"]
-                 [hiccup "1.0.5"]]
+                 [hiccup "1.0.5"]
+                 [compojure "1.6.1"]]
   :repl-options {:init-ns memecollect.core}
   :main memecollect.core/-main)

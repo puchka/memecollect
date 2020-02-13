@@ -13,6 +13,38 @@ $ sudo docker run -it --rm -p 3000:3000 memecollect
 Then navigate to http://localhost:3000 to see pieces of arts that
 are proposed to you.
 
+## Directory Structure of the project
+
+.
+├── CHANGELOG.md
+├── dirstruct.txt
+├── doc
+│   └── intro.md
+├── Dockerfile
+├── LICENSE
+├── project.clj
+├── README.md
+├── resources
+├── src
+│   └── memecollect
+│       ├── core.clj
+│       └── views
+│           ├── contents.clj
+│           └── layout.clj
+├── target
+│   ├── classes
+│   │   └── META-INF
+│   │       └── maven
+│   │           └── memecollect
+│   │               └── memecollect
+│   │                   └── pom.properties
+│   ├── repl-port
+│   └── stale
+│       └── leiningen.core.classpath.extract-native-dependencies
+└── test
+    └── memecollect
+        └── core_test.clj
+
 ## License
 
 Copyright © 2020

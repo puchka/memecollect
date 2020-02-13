@@ -1,14 +1,21 @@
 # memecollect
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure application designed to help users find and
+collect memes that correspond to his/her sense of humour.
 
 ## Usage
 
-FIXME
+```
+$ sudo docker build -t memecollect .
+$ sudo docker run -it --rm -p 3000:3000 memecollect
+```
+
+Then navigate to http://localhost:3000 to see pieces of arts that
+are proposed to you.
 
 ## License
 
-Copyright © 2020 FIXME
+Copyright © 2020
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at

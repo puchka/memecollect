@@ -15,35 +15,26 @@ are proposed to you.
 
 ## Directory Structure of the project
 
+```
 .
-├── CHANGELOG.md
-├── dirstruct.txt
-├── doc
-│   └── intro.md
-├── Dockerfile
-├── LICENSE
-├── project.clj
-├── README.md
-├── resources
-├── src
-│   └── memecollect
-│       ├── core.clj
-│       └── views
-│           ├── contents.clj
-│           └── layout.clj
-├── target
-│   ├── classes
-│   │   └── META-INF
-│   │       └── maven
-│   │           └── memecollect
-│   │               └── memecollect
-│   │                   └── pom.properties
-│   ├── repl-port
-│   └── stale
-│       └── leiningen.core.classpath.extract-native-dependencies
-└── test
-    └── memecollect
-        └── core_test.clj
+|-- CHANGELOG.md
+|-- doc
+|   `-- intro.md
+|-- Dockerfile
+|-- LICENSE
+|-- project.clj
+|-- README.md
+|-- resources
+|-- src
+|   `-- memecollect
+|       |-- core.clj
+|       `-- views
+|           |-- contents.clj
+|           `-- layout.clj
+`-- test
+    `-- memecollect
+        `-- core_test.clj
+```
 
 ## License
 

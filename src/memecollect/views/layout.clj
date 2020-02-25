@@ -1,11 +1,12 @@
 (ns memecollect.views.layout
-  (:use [hiccup.page :only (html5 include-css)]))
+  (:use [hiccup.page :only (html5 include-css include-js)]))
 
 (defn application [title & content]
   (html5 {:lang "en"}
          [:head
           [:title title]
-          (include-css "//stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css")
+          (include-css "//stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css")]
 
-          [:body
-           [:div {:class "container"} content ]]]))
+         [:body
+          [:div {:class "container"} content ]
+          (include-js "js/app.js")]))

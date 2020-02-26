@@ -43,7 +43,7 @@
         (if (and (not-any? str/blank? [username password confirm])
                  (= password confirm))
           (let [user (create-user (select-keys params [:username :password :admin]))]
-            ;; HERE IS WHERE YOU'D PUSH THE USER INTO YOUR DATABASES if desired
+            (swap! users assoc username user)
             (friend/merge-authentication
               (resp/redirect (misc/context-uri req username))
               user))

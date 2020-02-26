@@ -8,7 +8,7 @@
 
 (defroutes routes
   (GET "/" [] (layout/application "Home" (contents/index)))
-  (GET "/subscribe" [] (layout/application "Subscrition" (contents/subscribe)))
+  (GET "/subscribe" [] (layout/application "Subscription" (contents/subscribe)))
   (route/resources "/")
   (ANY "*" [] (route/not-found (layout/application "Page Not Found" (contents/not-found)))))
 

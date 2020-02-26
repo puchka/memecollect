@@ -121,6 +121,16 @@
 (defn home-page []
   [:h1 {:class "text-success"} "Welcome to memecollect!"])
 
+(defn login-form []
+  [:div {:class "row"}
+   [:div {:class "columns small-12"}
+    [:h3 "Login"]
+    [:div {:class "row"}
+     [:form {:method "POST" :action "login" :class "columns small-4"}
+      [:div "Username" [:input {:type "text" :name "username"}]]
+      [:div "Password" [:input {:type "password" :name "password"}]]
+      [:div [:input {:type "submit" :class "button" :value "Login"}]]]]]])
+
 (defn subscription-page []
   (let [email-address (atom nil)
         name (atom nil)
@@ -145,6 +155,9 @@
 
 (secretary/defroute "/subscribe" []
   (session/put! :current-page subscription-page))
+
+(secretary/defroute "/login" []
+  (session/put! :current-page login-form))
 
 ;; -------------------------
 ;; History

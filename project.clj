@@ -11,7 +11,8 @@
                  [compojure "1.6.1"]
                  [reagent "0.9.1"]
                  [reagent-utils "0.3.3"]
-                 [clj-commons/secretary "1.2.4"]]
+                 [clj-commons/secretary "1.2.4"]
+                 [com.cemerick/friend "0.2.3"]]
   :repl-options {:init-ns memecollect.core}
   :main memecollect.core/-main
   :plugins [[lein-cljsbuild "1.1.7"]]

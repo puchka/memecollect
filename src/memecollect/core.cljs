@@ -3,7 +3,8 @@
             [reagent.session :as session]
             [secretary.core :as secretary :include-macros true]
             [goog.events :as events]
-            [goog.history.EventType :as EventType])
+            [goog.history.EventType :as EventType]
+            [clojure.string :as str])
   (:import goog.history.Html5History))
 
 (defn check-nil-then-predicate
@@ -91,14 +92,14 @@
                     (prompt-message "What's your name?")
                     true))
 
-  (defn password-requirements
-    "A list to describe which password requirements have been met so far"
-    [password requirements]
-    [:div
-     [:ul (->> requirements
-               (filter (fn [req] (not ((:check-fn req) @password))))
-               (doall)
-               (map (fn [req] ^{:key req} [:li (:message req)])))]])
+(defn password-requirements
+  "A list to describe which password requirements have been met so far"
+  [password requirements]
+  [:div
+   [:ul (->> requirements
+             (filter (fn [req] (not ((:check-fn req) @password))))
+             (doall)
+             (map (fn [req] ^{:key req} [:li (:message req)])))]])
 
 (defn password-form [password]
   (let [password-type-atom (atom "password")]
@@ -141,6 +142,18 @@
       [:div "Password" [:input {:type "password" :name "password"}]]
       [:div [:input {:type "submit" :class "button" :value "Login"}]]]]]])
 
+(defn strong-password?
+  [password]
+  (and
+   (eight-or-more-characters? password)
+   (has-special-character? password)
+   (has-number? password)))
+
+(defn valid-form?
+  [email name password confirm]
+  (and (valid-email? @email) (not (str/blank? @name))
+       (strong-password? @password) (= @password @confirm)))
+
 (defn subscription-page []
   (let [email-address (atom nil)
         name (atom nil)
@@ -155,9 +168,17 @@
         (wrap-as-element-in-form [password-form password])
         (wrap-as-element-in-form [confirm-password-form confirm])
         (wrap-as-element-in-form [:div "Make you an admin? " [:input {:type "checkbox" :name "admin"}]])
-        (wrap-as-element-in-form [:input {:type "submit" :class "button" :value "Sign up"}])
+        (wrap-as-element-in-form [:input {
+                                          :type "submit"
+                                          :class "button"
+                                          :value "Sign up"
+                                          :disabled (boolean (not (valid-form? email-address name password confirm)))
+                                          }])
         ]
-       [:div "EMAIL ADDRESS IS " @email-address]
+       [:div (if (valid-email? @email-address) [:div] [:div {:class ["alert" "alert-warning"] } "Enter a valid email address"])
+        (if (not (str/blank? @name)) [:div] [:div {:class ["alert" "alert-warning"] }"Enter an username"])
+        (if (strong-password? @password) [:div] [:div {:class ["alert" "alert-warning"] }"Enter a strong password"])
+        (if (= @password @confirm) [:div] [:div {:class ["alert" "alert-warning"] }"Enter the same password and confirmation password"])]
        ]
       )))
 

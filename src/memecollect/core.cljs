@@ -75,7 +75,7 @@
   (let [email email-address-atom]
     (fn []
       [:div
-       [(input-and-prompt "email"
+       [(input-and-prompt "Email"
                           "email"
                           "email"
                           email-address-atom
@@ -83,9 +83,9 @@
                           true)]
        [email-validation email]])))
 
-(defn name-form [name-atom]
-  (input-and-prompt "name"
-                    "name"
+(defn username-form [name-atom]
+  (input-and-prompt "Username"
+                    "username"
                     "text"
                     name-atom
                     (prompt-message "What's your name?")
@@ -103,7 +103,7 @@
 (defn password-form [password]
   (let [password-type-atom (atom "password")]
     (fn []
-      [:div [(input-and-prompt "password"
+      [:div [(input-and-prompt "Password"
                                 "password"
                                 @password-type-atom
                                 password
@@ -112,6 +112,16 @@
        [password-requirements password [{:message "8 or more characters" :check-fn eight-or-more-characters?}
                                         {:message "At least one special character" :check-fn has-special-character?}
                                         {:message "At least one number" :check-fn has-number?}]]])))
+
+(defn confirm-password-form [password]
+  (fn []
+    (input-and-prompt "Confirm password"
+                        "confirm"
+                        "password"
+                        password
+                        (prompt-message "Confirm your password")
+                        true)
+     ))
 
 (defn wrap-as-element-in-form
   [element]
@@ -134,14 +144,18 @@
 (defn subscription-page []
   (let [email-address (atom nil)
         name (atom nil)
-        password (atom nil)]
+        password (atom nil)
+        confirm (atom nil)]
     (fn []
       [:div {:class "signup-wrapper"}
        [:h2 "Create an account"]
-       [:form
+       [:form {:method "POST" :action "signup"}
         (wrap-as-element-in-form [email-form email-address])
-        (wrap-as-element-in-form [name-form name])
+        (wrap-as-element-in-form [username-form name])
         (wrap-as-element-in-form [password-form password])
+        (wrap-as-element-in-form [confirm-password-form confirm])
+        (wrap-as-element-in-form [:div "Make you an admin? " [:input {:type "checkbox" :name "admin"}]])
+        (wrap-as-element-in-form [:input {:type "submit" :class "button" :value "Sign up"}])
         ]
        [:div "EMAIL ADDRESS IS " @email-address]
        ]

@@ -22,7 +22,11 @@
      [:div
       [:h3 "Logging in"]
       [:p (e/link-to (misc/context-uri req "login") "Click here to log in") "."]]
-     )])
+     )
+   (if (not (nil? (:flash req)))
+     [:div (:flash req)]
+     [:div])
+   ])
    
 
 (defn not-found []

@@ -8,7 +8,9 @@
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds])
+            [clojure.string :as str]
             [hiccup.page :as h]
+            [memecollect.misc :as misc]
             [memecollect.views.layout :as layout]
             [memecollect.views.contents :as contents]))
 
@@ -23,6 +25,13 @@
 
 (derive ::admin ::user)
 
+(defn- create-user
+  [{:keys [username password admin] :as user-data}]
+  (-> (dissoc user-data :admin)
+      (assoc :identity username
+             :password (creds/hash-bcrypt password)
+             :roles (into #{::user} (when admin [::admin])))))
+
 (defroutes routes
   (GET "/" req (layout/application "Home" (contents/index req)))
   (GET "/subscribe" [] (layout/application "Subscription" (contents/subscribe)))
@@ -30,6 +39,15 @@
     (layout/application "Login" (contents/login)))
   (GET "/logout" req
     (friend/logout* (resp/redirect (str (:context req) "/"))))
+  (POST "/signup" {{:keys [username password confirm] :as params} :params :as req}
+        (if (and (not-any? str/blank? [username password confirm])
+                 (= password confirm))
+          (let [user (create-user (select-keys params [:username :password :admin]))]
+            ;; HERE IS WHERE YOU'D PUSH THE USER INTO YOUR DATABASES if desired
+            (friend/merge-authentication
+              (resp/redirect (misc/context-uri req username))
+              user))
+          (assoc (resp/redirect (str (:context req) "/")) :flash "passwords don't match!")))
   (GET "/requires-authentication" req
     (friend/authenticated "Thanks for authenticating!"))
   (GET "/role-user" req

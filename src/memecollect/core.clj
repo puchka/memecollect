@@ -45,14 +45,16 @@
           (let [user (create-user (select-keys params [:username :password :admin]))]
             (swap! users assoc username user)
             (friend/merge-authentication
-              (resp/redirect (misc/context-uri req username))
+              (resp/redirect (misc/context-uri req (str "user/" username)))
               user))
           (assoc (resp/redirect (str (:context req) "/")) :flash "passwords don't match!")))
   (GET "/requires-authentication" req
     (friend/authenticated "Thanks for authenticating!"))
-  (GET "/role-user" req
-    (friend/authorize #{::user} "You're a user!"))
-  (GET "/role-admin" req
+  (GET "/user/:user" req
+       (if (get @users (:user (:params req)))
+         (friend/authorize #{::user} (str "Welcome to " (:user (:params req)) "'s meme collection :)"))
+         (route/not-found (layout/application "User Not Found" (contents/not-found)))))
+  (GET "/admin" req
     (friend/authorize #{::admin} "You're an admin!"))
   (route/resources "/")
   (ANY "*" [] (route/not-found (layout/application "Page Not Found" (contents/not-found)))))

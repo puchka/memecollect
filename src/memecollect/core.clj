@@ -1,7 +1,7 @@
 (ns memecollect.core
   (:require [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
-            [cemerick.friend.credentials :refer (hash-bcrypt)]
+            [ring.middleware.resource :as res]
             [compojure.core :refer [defroutes GET POST ANY]]
             [compojure.route :as route]
             [compojure.handler :as handler]
@@ -12,25 +12,16 @@
             [hiccup.page :as h]
             [memecollect.misc :as misc]
             [memecollect.views.layout :as layout]
-            [memecollect.views.contents :as contents]))
+            [memecollect.views.contents :as contents]
+            [memecollect.users :as users]))
 
-(def users (atom {"friend" {:username "friend"
-                            :password (hash-bcrypt "clojure")
-                            :pin "1234" ;; only used by multi-factor
-                            :roles #{::user}}
-                  "friend-admin" {:username "friend-admin"
-                                  :password (hash-bcrypt "clojure")
-                                  :pin "1234" ;; only used by multi-factor
-                                  :roles #{::admin}}}))
-
-(derive ::admin ::user)
 
 (defn- create-user
   [{:keys [username password admin] :as user-data}]
   (-> (dissoc user-data :admin)
       (assoc :identity username
              :password (creds/hash-bcrypt password)
-             :roles (into #{::user} (when admin [::admin])))))
+             :roles (into #{::users/user} (when admin [::users/admin])))))
 
 (defroutes routes
   (GET "/" req (layout/application "Home" (contents/index req)))
@@ -43,7 +34,7 @@
         (if (and (not-any? str/blank? [username password confirm])
                  (= password confirm))
           (let [user (create-user (select-keys params [:username :password :admin]))]
-            (swap! users assoc username user)
+            (swap! users/users assoc username user)
             (friend/merge-authentication
               (resp/redirect (misc/context-uri req (str "user/" username)))
               user))
@@ -51,15 +42,16 @@
   (GET "/requires-authentication" req
     (friend/authenticated "Thanks for authenticating!"))
   (GET "/user/:user" req
-       (if (get @users (:user (:params req)))
-         (friend/authorize #{::user} (str "Welcome to " (:user (:params req)) "'s meme collection :)"))
+       (if (get @users/users (:user (:params req)))
+         (friend/authorize #{::users/user}
+                           (layout/application (str (:user (:params req)) "'s list") (contents/user req)))
          (route/not-found (layout/application "User Not Found" (contents/not-found)))))
   (GET "/admin" req
-    (friend/authorize #{::admin} "You're an admin!"))
+    (friend/authorize #{::users/admin} "You're an admin!"))
   (route/resources "/")
   (ANY "*" [] (route/not-found (layout/application "Page Not Found" (contents/not-found)))))
 
-(def page (handler/site
+(def page (->
             (friend/authenticate
               routes
               {:allow-anon? true
@@ -68,8 +60,10 @@
                :unauthorized-handler #(-> (h/html5 [:h2 "You do not have sufficient privileges to access " (:uri %)])
                                         resp/response
                                         (resp/status 401))
-               :credential-fn #(creds/bcrypt-credential-fn @users %)
-               :workflows [(workflows/interactive-form)]})))
+               :credential-fn #(creds/bcrypt-credential-fn @users/users %)
+               :workflows [(workflows/interactive-form)]})
+            (handler/site)
+            (res/wrap-resource "public")))
 
 (defn -main
   []

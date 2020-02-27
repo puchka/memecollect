@@ -9,4 +9,4 @@
 
          [:body
           [:div {:class "container"} content ]
-          (include-js "js/app.js")]))
+          (include-js "/js/app.js")]))

@@ -142,6 +142,9 @@
       [:div "Password" [:input {:type "password" :name "password"}]]
       [:div [:input {:type "submit" :class "button" :value "Login"}]]]]]])
 
+(defn user-page []
+  [:p (str "Welcome to " (session/get :current-user) "'s meme collection :)")])
+
 (defn strong-password?
   [password]
   (and
@@ -193,6 +196,10 @@
 
 (secretary/defroute "/login" []
   (session/put! :current-page login-form))
+
+(secretary/defroute "/user/:user" [user]
+  (session/put! :current-page user-page)
+  (session/put! :current-user user))
 
 ;; -------------------------
 ;; History

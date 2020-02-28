@@ -13,7 +13,8 @@
             [memecollect.misc :as misc]
             [memecollect.views.layout :as layout]
             [memecollect.views.contents :as contents]
-            [memecollect.users :as users]))
+            [memecollect.users :as users]
+            [memecollect.data.persistence :as pers]))
 
 
 (defn- create-user
@@ -34,7 +35,7 @@
         (if (and (not-any? str/blank? [username password confirm])
                  (= password confirm))
           (let [user (create-user (select-keys params [:username :password :admin]))]
-            (swap! users/users assoc username user)
+            (swap! pers/users assoc username user)
             (friend/merge-authentication
               (resp/redirect (misc/context-uri req (str "user/" username)))
               user))
@@ -42,7 +43,7 @@
   (GET "/requires-authentication" req
     (friend/authenticated "Thanks for authenticating!"))
   (GET "/user/:user" req
-       (if (get @users/users (:user (:params req)))
+       (if (get @pers/users (:user (:params req)))
          (friend/authorize #{::users/user}
                            (layout/application (str (:user (:params req)) "'s list") (contents/user req)))
          (route/not-found (layout/application "User Not Found" (contents/not-found)))))
@@ -60,7 +61,7 @@
                :unauthorized-handler #(-> (h/html5 [:h2 "You do not have sufficient privileges to access " (:uri %)])
                                         resp/response
                                         (resp/status 401))
-               :credential-fn #(creds/bcrypt-credential-fn @users/users %)
+               :credential-fn #(creds/bcrypt-credential-fn @pers/users %)
                :workflows [(workflows/interactive-form)]})
             (handler/site)
             (res/wrap-resource "public")))

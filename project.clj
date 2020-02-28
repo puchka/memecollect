@@ -12,7 +12,8 @@
                  [reagent "0.9.1"]
                  [reagent-utils "0.3.3"]
                  [clj-commons/secretary "1.2.4"]
-                 [com.cemerick/friend "0.2.3"]]
+                 [com.cemerick/friend "0.2.3"]
+                 [duratom "0.5.1"]]
   :repl-options {:init-ns memecollect.core}
   :main memecollect.core/-main
   :plugins [[lein-cljsbuild "1.1.7"]]

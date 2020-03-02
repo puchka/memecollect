@@ -14,41 +14,54 @@
             [memecollect.views.layout :as layout]
             [memecollect.views.contents :as contents]
             [memecollect.users :as users]
-            [memecollect.data.persistence :as pers]))
+            [memecollect.data.persistence :as pers]
+            [memecollect.util.sendmail :as mail]))
 
+(defn parse-int [s]
+   (Integer. (re-find  #"\d+" s )))
 
-(defn- create-user
-  [{:keys [username password admin] :as user-data}]
-  (-> (dissoc user-data :admin)
-      (assoc :identity username
-             :password (creds/hash-bcrypt password)
-             :roles (into #{::users/user} (when admin [::users/admin])))))
+(defn- check-activation-code
+  [req]
+  (let [user (first (filter #(= (:user-identity-hash (second %)) (-> req :params :q)) (seq @pers/users)))]
+    (= (-> req :params :activation-code (parse-int)) (-> user (second) :activation-code))
+    ))
+
+(defn- account-activation
+  [req]
+  (let [valid-account? (check-activation-code req)
+        user (first (filter #(= (:user-identity-hash (second %)) (-> req :params :q)) (seq @pers/users)))]
+    (when valid-account?
+      (swap! pers/users update-in [(first user) :status] #(let [previous-status %] ::users/active)))
+    (layout/application "Account activation"
+                        (contents/activate-account valid-account?))))
 
 (defroutes routes
   (GET "/" req (layout/application "Home" (contents/index req)))
   (GET "/subscribe" [] (layout/application "Subscription" (contents/subscribe)))
   (GET "/login" req
-    (layout/application "Login" (contents/login)))
+       (layout/application "Login" (contents/login)))
   (GET "/logout" req
-    (friend/logout* (resp/redirect (str (:context req) "/"))))
+       (friend/logout* (resp/redirect (str (:context req) "/"))))
   (POST "/signup" {{:keys [username password confirm] :as params} :params :as req}
         (if (and (not-any? str/blank? [username password confirm])
                  (= password confirm))
-          (let [user (create-user (select-keys params [:username :password :admin]))]
+          (let [user (users/create-user (select-keys params [:username :email :password :admin]))]
             (swap! pers/users assoc username user)
+            (mail/send-activation-code username (:email user) (:activation-code user))
             (friend/merge-authentication
-              (resp/redirect (misc/context-uri req (str "user/" username)))
-              user))
+             (resp/redirect (misc/context-uri req (str "user/" username)))
+             user))
           (assoc (resp/redirect (str (:context req) "/")) :flash "passwords don't match!")))
   (GET "/requires-authentication" req
-    (friend/authenticated "Thanks for authenticating!"))
+       (friend/authenticated "Thanks for authenticating!"))
   (GET "/user/:user" req
        (if (get @pers/users (:user (:params req)))
          (friend/authorize #{::users/user}
                            (layout/application (str (:user (:params req)) "'s list") (contents/user req)))
          (route/not-found (layout/application "User Not Found" (contents/not-found)))))
   (GET "/admin" req
-    (friend/authorize #{::users/admin} "You're an admin!"))
+       (friend/authorize #{::users/admin} "You're an admin!"))
+  (GET "/activate-account" req (account-activation req))
   (route/resources "/")
   (ANY "*" [] (route/not-found (layout/application "Page Not Found" (contents/not-found)))))
 

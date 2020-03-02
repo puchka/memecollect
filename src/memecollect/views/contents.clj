@@ -50,3 +50,13 @@
 (defn user
   [req]
   [:div#app])
+
+(defn activate-account
+  [activation-status]
+  [:div
+   [:div#app]
+   (if activation-status
+     [:p "Account activation successful!"]
+     [:p "An error occured during the activation of your account :("])
+   ]
+  )

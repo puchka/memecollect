@@ -185,6 +185,9 @@
        ]
       )))
 
+(defn account-activation-page []
+  [:h1 "Account Activation"])
+
 (defn current-page []
   [:div [(session/get :current-page)]])
 
@@ -200,6 +203,9 @@
 (secretary/defroute "/user/:user" [user]
   (session/put! :current-page user-page)
   (session/put! :current-user user))
+
+(secretary/defroute "/activate-account" []
+  (session/put! :current-page account-activation-page))
 
 ;; -------------------------
 ;; History

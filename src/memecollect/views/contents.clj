@@ -9,9 +9,9 @@
   [:div
    [:div {:id "app"}]
    [:p (if-let [identity (friend/identity req)]
-         (apply str "Logged in, with these roles: "
-                (-> identity friend/current-authentication :roles))
-         "anonymous user")]
+         (apply str "Welcome back "
+                (-> identity friend/current-authentication :username) "!")
+         "")]
    [:ul
     (if-let [identity (friend/identity req)]
       [:li (e/link-to (misc/context-uri req
@@ -20,14 +20,10 @@
     (if-let [identity (friend/identity req)]
       (when (-> identity friend/current-authentication :roles (contains? ::users/admin))
         [:li (e/link-to (misc/context-uri req "admin") "Admin dashboard")]))
-    [:li (e/link-to (misc/context-uri req "requires-authentication")
-                    "Requires any authentication, no specific role requirement")]
-    (if (friend/identity req)
+    
+    (when (not (friend/identity req))
       [:div
-       [:h3 "Logging out"]
-       [:p (e/link-to (misc/context-uri req "logout") "Click here to log out") "."]]
-      [:div
-       [:h3 "Logging in"]
+       [:p (e/link-to (misc/context-uri req "subscribe") "Don't have an account yet") "?"]
        [:p (e/link-to (misc/context-uri req "login") "Click here to log in") "."]]
       )
     (if (not (nil? (:flash req)))
@@ -45,7 +41,10 @@
   [:div#app])
 
 (defn login []
-  [:div#app])
+  [:div
+   [:div#app]   
+   [:p (e/link-to "/subscribe" "Don't have an account yet") "?"]]
+  )
 
 (defn user
   [req]

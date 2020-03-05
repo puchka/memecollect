@@ -32,14 +32,14 @@
         user (first (filter #(= (:user-identity-hash (second %)) (-> req :params :q)) (seq @pers/users)))]
     (when valid-account?
       (swap! pers/users update-in [(first user) :status] #(let [previous-status %] ::users/active)))
-    (layout/application "Account activation"
+    (layout/application req "Account activation"
                         (contents/activate-account valid-account?))))
 
 (defroutes routes
-  (GET "/" req (layout/application "Home" (contents/index req)))
-  (GET "/subscribe" [] (layout/application "Subscription" (contents/subscribe)))
+  (GET "/" req (layout/application req "Home" (contents/index req)))
+  (GET "/subscribe" req (layout/application req "Subscription" (contents/subscribe)))
   (GET "/login" req
-       (layout/application "Login" (contents/login)))
+       (layout/application req "Login" (contents/login)))
   (GET "/logout" req
        (friend/logout* (resp/redirect (str (:context req) "/"))))
   (POST "/signup" {{:keys [username password confirm] :as params} :params :as req}
@@ -57,13 +57,13 @@
   (GET "/user/:user" req
        (if (get @pers/users (:user (:params req)))
          (friend/authorize #{::users/user}
-                           (layout/application (str (:user (:params req)) "'s list") (contents/user req)))
-         (route/not-found (layout/application "User Not Found" (contents/not-found)))))
+                           (layout/application req (str (:user (:params req)) "'s list") (contents/user req)))
+         (route/not-found (layout/application req "User Not Found" (contents/not-found)))))
   (GET "/admin" req
        (friend/authorize #{::users/admin} "You're an admin!"))
   (GET "/activate-account" req (account-activation req))
   (route/resources "/")
-  (ANY "*" [] (route/not-found (layout/application "Page Not Found" (contents/not-found)))))
+  (ANY "*" req (route/not-found (layout/application req "Page Not Found" (contents/not-found)))))
 
 (def page (->
             (friend/authenticate

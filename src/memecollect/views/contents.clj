@@ -48,7 +48,11 @@
 
 (defn user
   [req]
-  [:div#app])
+  [:div#app
+   (when (= ::users/inactive (-> req friend/identity friend/current-authentication :status))
+     [:div {:class "alert alert-success"
+            :role "alert"} "A link have been set to you with a link to activate your account."])
+   ])
 
 (defn activate-account
   [activation-status]

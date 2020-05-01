@@ -1,23 +1,60 @@
 # memecollect
 
-A Clojure application designed to help users find and
+A Clojure application destined to help users find and
 collect memes that correspond to his/her sense of humour.
 
 ## Usage
 
+Running with Docker
+-------------------
+
+First, put the following environment variable inside a file e.g. `.env` in home directory
+
+**MEMECOLLECT_BASE_URL** Base URL for the memecollect app
+**MEMECOLLECT_SMTP_HOSTNAME** SMTP Hostname for sending email
+**MEMECOLLECT_SMTP_USERNAME** SMTP Username for the SMTP server
+**MEMECOLLECT_SMTP_PASSWORD** SMTP Password for the SMTP server
+
+Second, run the following commands in a shell.
+
 ```
 $ sudo docker build -t memecollect .
-$ sudo docker run -it --rm -p 3000:3000 memecollect
+$ sudo docker run --env-file=~/.env -it --rm -p 3000:3000 memecollect
 ```
 
 Then navigate to http://localhost:3000 to see pieces of arts that
 are proposed to you.
+
+
+To run locally
+--------------
+
+### Environment variables
+
+The following environment variables are required before running memecollect.
+e.g. This can be done by defining them in a shell script and run it with `source env_var.sh`
+
+**MEMECOLLECT_DATA_DIR** Path to the data directory
+**MEMECOLLECT_BASE_URL** Base URL for the memecollect app
+**MEMECOLLECT_SMTP_HOSTNAME** SMTP Hostname for sending email
+**MEMECOLLECT_SMTP_USERNAME** SMTP Username for the SMTP server
+**MEMECOLLECT_SMTP_PASSWORD** SMTP Password for the SMTP server
+
+Run the following commands in different shells after defining the environment variables described above:
+
+```
+$ lein figwheel
+```
+```
+$ lein run
+```
 
 ## Directory Structure of the project
 
 ```
 .
 |-- CHANGELOG.md
+|-- data
 |-- doc
 |   `-- intro.md
 |-- Dockerfile
@@ -25,15 +62,31 @@ are proposed to you.
 |-- project.clj
 |-- README.md
 |-- resources
+|   `-- public
+|       |-- css
+|       |   `-- design.css
+|       |-- images
+|       |   `-- memecollect-logo.png
+|       `-- js
+|           |-- app.js
+|           `-- out
 |-- src
 |   `-- memecollect
 |       |-- core.clj
+|       |-- core.cljs
+|       |-- data
+|       |   `-- persistence.clj
+|       |-- misc.clj
+|       |-- users.clj
+|       |-- util
+|       |   |-- properties.clj
+|       |   `-- sendmail.clj
 |       `-- views
 |           |-- contents.clj
 |           `-- layout.clj
-`-- test
-    `-- memecollect
-        `-- core_test.clj
+|-- test
+|   `-- memecollect
+|       `-- core_test.clj
 ```
 
 ## License

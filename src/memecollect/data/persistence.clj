@@ -13,3 +13,7 @@
 (def users (core/duratom :local-file
                          :file-path (.getPath (io/file data_dir_path "users"))
                          :init {}))
+
+(def email-sending-errors (core/duratom :local-file
+                                       :file-path (.getPath (io/file data_dir_path "email-sending-errors"))
+                                       :init '()))

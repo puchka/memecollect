@@ -18,11 +18,14 @@
                  [digest "1.4.9"]]
   :repl-options {:init-ns memecollect.core}
   :main memecollect.core/-main
-  :plugins [[lein-cljsbuild "1.1.7"]]
+  :profiles {:test {:dependencies [[de.saly/javamail-mock2-fullmock "0.5-beta4"]]}}
+  :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-figwheel "0.5.18"]]
   :cljsbuild {:builds [{:id "main"
                         :source-paths ["src"]
+                        :figwheel true
                         :compiler {:main "memecollect.core"
                                    :output-to "resources/public/js/app.js"
                                    :output-dir "resources/public/js/out"
-                                   :asset-path "js/out"}}]}
+                                   :asset-path "/js/out"}}]}
   )

@@ -6,6 +6,7 @@
 
 (def env_vars {:base_url "MEMECOLLECT_BASE_URL"
                :hostname "MEMECOLLECT_SMTP_HOSTNAME"
+               :port "MEMECOLLECT_SMTP_PORT"
                :username "MEMECOLLECT_SMTP_USERNAME"
                :password "MEMECOLLECT_SMTP_PASSWORD"
                })
@@ -17,7 +18,7 @@
 
 (defn assert_conf [conf env_vars user-name]
   (when
-      (some-fn #(cstr/blank? (second %)) conf)
+      (some #(cstr/blank? (second %)) conf)
     (println (str (cstr/join ", " (map #((first %) env_vars) (filter #(cstr/blank? (second %)) conf))) " environment variables were not set."))
     (swap! pers/email-sending-errors conj (list :email-activation-code user-name))))
 
@@ -25,6 +26,7 @@
   [user-name user-email activation-code]
   (assert_conf SMTP_conf env_vars user-name)
   (let [send-result (post/send-message {:host (:hostname SMTP_conf)
+                                        :port (Integer/parseInt (:port SMTP_conf))
                                         :user (:username SMTP_conf)
                                         :pass (:password SMTP_conf)}
                                        {:from "memecollect.com@gmail.com"

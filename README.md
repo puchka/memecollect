@@ -12,6 +12,7 @@ First, put the following environment variable inside a file e.g. `.env` in home 
 
 - **MEMECOLLECT_BASE_URL** Base URL for the memecollect app
 - **MEMECOLLECT_SMTP_HOSTNAME** SMTP Hostname for sending email
+- **MEMECOLLECT_SMTP_PORT** SMTP Port for sending email
 - **MEMECOLLECT_SMTP_USERNAME** SMTP Username for the SMTP server
 - **MEMECOLLECT_SMTP_PASSWORD** SMTP Password for the SMTP server
 
@@ -37,6 +38,7 @@ e.g. This can be done by defining them in a shell script and run it with `source
 - **MEMECOLLECT_DATA_DIR** Path to the data directory
 - **MEMECOLLECT_BASE_URL** Base URL for the memecollect app
 - **MEMECOLLECT_SMTP_HOSTNAME** SMTP Hostname for sending email
+- **MEMECOLLECT_SMTP_PORT** SMTP Port for sending email
 - **MEMECOLLECT_SMTP_USERNAME** SMTP Username for the SMTP server
 - **MEMECOLLECT_SMTP_PASSWORD** SMTP Password for the SMTP server
 
@@ -46,7 +48,7 @@ Run the following commands in different shells after defining the environment va
 $ lein figwheel
 ```
 ```sh
-$ lein run
+$ export $(cat .env | xargs) && lein run
 ```
 
 ## Directory Structure of the project

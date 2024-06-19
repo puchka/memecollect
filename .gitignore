@@ -12,3 +12,8 @@ pom.xml.asc
 .hgignore
 .hg/
 resources/public/js/*
+.env
+.rebel_readline_history
+email-sending-errors
+figwheel_server.log
+users

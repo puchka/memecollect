@@ -1,5 +1,6 @@
 (ns memecollect.core
   (:require [reagent.core :as reagent :refer [atom]]
+            [reagent.dom :as rdom]
             [reagent.session :as session]
             [secretary.core :as secretary :include-macros true]
             [goog.events :as events]
@@ -223,7 +224,7 @@
 ;; -------------------------
 ;; Initialize app
 (defn init! []
-  (reagent/render-component [current-page] (.getElementById js/document "app")))
+  (rdom/render [current-page] (.getElementById js/document "app")))
 
 (hook-browser-navigation!)
 
